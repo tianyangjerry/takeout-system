@@ -1,3 +1,23 @@
+server:
+  port: 8090
+
 spring:
   application:
     name: backend
+  datasource:
+    url: jdbc:mysql://localhost:3306/takeout_system?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: always
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+app:
+  jwt:
+    secret: change-this-secret-before-production
+    expire-hours: 24
