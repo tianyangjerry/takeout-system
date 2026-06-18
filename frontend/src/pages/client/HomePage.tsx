@@ -8,7 +8,7 @@ import { dishApi } from '../../api/dishes'
 import { DishCard } from '../../components/DishCard'
 import { EmptyState, ErrorState, LoadingBlock } from '../../components/PageState'
 import { SectionTitle } from '../../components/SectionTitle'
-import heroImage from '../../assets/hero.png'
+import heroImage from '../../assets/hero-campus-takeout.png'
 import { useAuthStore } from '../../stores/authStore'
 import type { Dish } from '../../types/dish'
 

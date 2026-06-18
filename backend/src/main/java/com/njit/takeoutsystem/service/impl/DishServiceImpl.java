@@ -93,11 +93,16 @@ public class DishServiceImpl implements DishService {
 
     @Override
     @Transactional
-    public void delete(Long id) {
+    public boolean delete(Long id) {
         if (dishMapper.findById(id) == null) {
             throw new BusinessException(404, "菜品不存在");
         }
+        if (dishMapper.countOrderItems(id) > 0) {
+            dishMapper.updateStatus(id, 0);
+            return false;
+        }
         dishMapper.delete(id);
+        return true;
     }
 
     private DishVO withRecommendScore(Dish dish) {

@@ -1,12 +1,12 @@
 package com.njit.takeoutsystem.config;
 
+import com.njit.takeoutsystem.utils.UploadPathUtil;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.nio.file.Path;
 
 @Configuration
 public class CorsConfig {
@@ -25,7 +25,7 @@ public class CorsConfig {
 
             @Override
             public void addResourceHandlers(ResourceHandlerRegistry registry) {
-                String uploadPath = Path.of("uploads").toAbsolutePath().toUri().toString();
+                String uploadPath = UploadPathUtil.uploadRoot().toUri().toString();
                 registry.addResourceHandler("/uploads/**").addResourceLocations(uploadPath);
             }
         };

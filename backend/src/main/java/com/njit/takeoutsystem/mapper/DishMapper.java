@@ -72,6 +72,9 @@ public interface DishMapper {
             """)
     Dish findById(Long id);
 
+    @Select("SELECT COUNT(*) FROM order_item WHERE dish_id = #{id}")
+    long countOrderItems(Long id);
+
     @Select("""
             SELECT d.*, c.name AS category_name
             FROM dish d

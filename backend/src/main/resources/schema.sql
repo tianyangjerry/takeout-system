@@ -115,8 +115,14 @@ VALUES
 
 INSERT IGNORE INTO dish (id, category_id, name, price, stock, image_url, description, status, sales, rating)
 VALUES
-  (1, 1, '黄焖鸡米饭', 18.00, 32, NULL, '鸡肉鲜嫩，汤汁浓郁，适合午餐高峰快速点餐。', 1, 156, 4.80),
-  (2, 1, '香辣鸡排饭', 16.00, 26, NULL, '香辣鸡排搭配米饭和时蔬，校园人气套餐。', 1, 98, 4.90),
-  (3, 2, '番茄牛肉面', 17.00, 20, NULL, '番茄汤底酸甜开胃，牛肉分量充足。', 1, 88, 4.70),
-  (4, 3, '珍珠奶茶', 10.00, 45, NULL, '经典珍珠奶茶，甜度适中。', 1, 120, 4.60),
-  (5, 4, '炸鸡腿套餐', 15.00, 18, NULL, '外酥里嫩，搭配小食更满足。', 1, 76, 4.50);
+  (1, 1, '黄焖鸡米饭', 18.00, 32, '/uploads/dishes/dish-1-huangmenji.jpg', '鸡肉鲜嫩，汤汁浓郁，适合午餐高峰快速点餐。', 1, 156, 4.80),
+  (2, 1, '香辣鸡排饭', 16.00, 26, '/uploads/dishes/dish-2-jipai-rice.jpg', '香辣鸡排搭配米饭和时蔬，校园人气套餐。', 1, 98, 4.90),
+  (3, 2, '番茄牛肉面', 17.00, 20, '/uploads/dishes/dish-3-beef-noodle.jpg', '番茄汤底酸甜开胃，牛肉分量充足。', 1, 88, 4.70),
+  (4, 3, '珍珠奶茶', 10.00, 45, '/uploads/dishes/dish-4-milk-tea.jpg', '经典珍珠奶茶，甜度适中。', 1, 120, 4.60),
+  (5, 4, '炸鸡腿套餐', 15.00, 18, '/uploads/dishes/dish-5-fried-chicken.jpg', '外酥里嫩，搭配小食更满足。', 1, 76, 4.50);
+
+UPDATE dish SET image_url = '/uploads/dishes/dish-1-huangmenji.jpg' WHERE id = 1;
+UPDATE dish SET image_url = '/uploads/dishes/dish-2-jipai-rice.jpg' WHERE id = 2;
+UPDATE dish SET image_url = '/uploads/dishes/dish-3-beef-noodle.jpg' WHERE id = 3;
+UPDATE dish SET image_url = '/uploads/dishes/dish-4-milk-tea.jpg' WHERE id = 4;
+UPDATE dish SET image_url = '/uploads/dishes/dish-5-fried-chicken.jpg' WHERE id = 5;

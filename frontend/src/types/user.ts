@@ -24,4 +24,6 @@ export interface RegisterRequest {
   password: string
   phone?: string
   address?: string
+  role?: UserRole
+  adminCode?: string
 }

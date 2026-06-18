@@ -17,6 +17,10 @@ import org.springframework.util.StringUtils;
 
 @Service
 public class AuthServiceImpl implements AuthService {
+    private static final String ADMIN_REGISTER_CODE = "yangyang";
+    private static final String ROLE_ADMIN = "ADMIN";
+    private static final String ROLE_CUSTOMER = "CUSTOMER";
+
     private final UserMapper userMapper;
     private final JwtUtil jwtUtil;
 
@@ -37,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(PasswordUtil.hash(request.getPassword()));
         user.setPhone(request.getPhone());
         user.setAddress(request.getAddress());
-        user.setRole("CUSTOMER");
+        user.setRole(resolveRegisterRole(request));
         userMapper.insert(user);
         return UserVO.from(user);
     }
@@ -74,5 +78,19 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(401, "登录用户不存在");
         }
         return user;
+    }
+
+    private String resolveRegisterRole(RegisterRequest request) {
+        String role = StringUtils.hasText(request.getRole()) ? request.getRole().trim().toUpperCase() : ROLE_CUSTOMER;
+        if (ROLE_CUSTOMER.equals(role)) {
+            return ROLE_CUSTOMER;
+        }
+        if (ROLE_ADMIN.equals(role)) {
+            if (!ADMIN_REGISTER_CODE.equals(request.getAdminCode())) {
+                throw new BusinessException(400, "管理员注册码错误");
+            }
+            return ROLE_ADMIN;
+        }
+        throw new BusinessException(400, "注册角色无效");
     }
 }

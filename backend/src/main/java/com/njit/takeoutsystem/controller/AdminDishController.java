@@ -66,8 +66,8 @@ public class AdminDishController {
             @PathVariable Long id
     ) {
         currentUserUtil.requireAdmin(authorizationHeader);
-        dishService.delete(id);
-        return ApiResponse.success("删除成功", null);
+        boolean deleted = dishService.delete(id);
+        return ApiResponse.success(deleted ? "删除成功" : "菜品已有订单，已改为下架", null);
     }
 
     @Data

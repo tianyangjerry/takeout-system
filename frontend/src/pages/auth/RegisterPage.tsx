@@ -1,11 +1,14 @@
 import { useMutation } from '@tanstack/react-query'
 import type { FormEvent } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { authApi } from '../../api/auth'
 import { ErrorState } from '../../components/PageState'
+import type { UserRole } from '../../types/user'
 
 export function RegisterPage() {
   const navigate = useNavigate()
+  const [role, setRole] = useState<UserRole>('CUSTOMER')
   const mutation = useMutation({
     mutationFn: authApi.register,
     onSuccess: () => navigate('/login'),
@@ -19,6 +22,8 @@ export function RegisterPage() {
       password: String(form.get('password') || ''),
       phone: String(form.get('phone') || ''),
       address: String(form.get('address') || ''),
+      role,
+      adminCode: role === 'ADMIN' ? String(form.get('adminCode') || '') : undefined,
     })
   }
 
@@ -48,6 +53,28 @@ export function RegisterPage() {
           <span className="text-sm font-semibold text-stone-700">默认地址</span>
           <input name="address" className="mt-2 w-full rounded-lg border border-stone-200 px-4 py-3 outline-orange-400" />
         </label>
+        <label className="block">
+          <span className="text-sm font-semibold text-stone-700">注册身份</span>
+          <select
+            value={role}
+            onChange={(event) => setRole(event.target.value as UserRole)}
+            className="mt-2 w-full rounded-lg border border-stone-200 px-4 py-3 outline-orange-400"
+          >
+            <option value="CUSTOMER">客户</option>
+            <option value="ADMIN">管理员</option>
+          </select>
+        </label>
+        {role === 'ADMIN' ? (
+          <label className="block">
+            <span className="text-sm font-semibold text-stone-700">管理员预设码</span>
+            <input
+              name="adminCode"
+              type="password"
+              required
+              className="mt-2 w-full rounded-lg border border-stone-200 px-4 py-3 outline-orange-400"
+            />
+          </label>
+        ) : null}
         {mutation.isError ? <ErrorState message={mutation.error.message} /> : null}
         <button
           type="submit"

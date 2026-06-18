@@ -22,5 +22,5 @@ public interface DishService {
 
     void updateStatus(Long id, Integer status);
 
-    void delete(Long id);
+    boolean delete(Long id);
 }

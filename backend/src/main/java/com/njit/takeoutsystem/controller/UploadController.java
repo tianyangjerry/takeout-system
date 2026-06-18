@@ -3,6 +3,7 @@ package com.njit.takeoutsystem.controller;
 import com.njit.takeoutsystem.common.ApiResponse;
 import com.njit.takeoutsystem.common.BusinessException;
 import com.njit.takeoutsystem.utils.CurrentUserUtil;
+import com.njit.takeoutsystem.utils.UploadPathUtil;
 import com.njit.takeoutsystem.vo.UploadVO;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -49,7 +50,7 @@ public class UploadController {
         }
 
         String fileName = UUID.randomUUID() + "." + extension;
-        Path directory = Path.of("uploads", "dishes").toAbsolutePath();
+        Path directory = UploadPathUtil.dishUploadDirectory();
         Path target = directory.resolve(fileName);
 
         try {

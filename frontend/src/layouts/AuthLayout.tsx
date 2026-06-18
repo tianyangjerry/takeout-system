@@ -1,5 +1,5 @@
 import { Link, Outlet } from 'react-router-dom'
-import heroImage from '../assets/hero.png'
+import heroImage from '../assets/hero-campus-takeout.png'
 
 export function AuthLayout() {
   return (
