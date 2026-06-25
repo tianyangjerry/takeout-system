@@ -1,0 +1,539 @@
+{
+  "info": {
+    "_postman_id": "d72a3a1a-8d68-4f52-b479-takeout-system",
+    "name": "智慧校园外卖点餐系统 API",
+    "description": "导入 Postman 后按文件夹顺序测试。先执行“用户认证 / 管理员登录”和“用户认证 / 客户登录”，脚本会自动保存 adminToken、customerToken。baseUrl 默认是 http://localhost:8090/api。",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8090/api", "type": "string" },
+    { "key": "adminUsername", "value": "admin", "type": "string" },
+    { "key": "adminPassword", "value": "admin123", "type": "string" },
+    { "key": "customerUsername", "value": "student001", "type": "string" },
+    { "key": "customerPassword", "value": "123456", "type": "string" },
+    { "key": "adminToken", "value": "", "type": "string" },
+    { "key": "customerToken", "value": "", "type": "string" },
+    { "key": "categoryId", "value": "1", "type": "string" },
+    { "key": "dishId", "value": "1", "type": "string" },
+    { "key": "cartItemId", "value": "1", "type": "string" },
+    { "key": "orderId", "value": "1", "type": "string" },
+    { "key": "imageUrl", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "用户认证",
+      "item": [
+        {
+          "name": "注册客户",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{customerUsername}}\",\n  \"password\": \"{{customerPassword}}\",\n  \"phone\": \"13900000001\",\n  \"address\": \"南京工程学院学生宿舍 1 栋 101\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "客户登录 - 自动保存 customerToken",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('login success', function () { pm.response.to.have.status(200); });",
+                "const json = pm.response.json();",
+                "if (json.data && json.data.token) { pm.collectionVariables.set('customerToken', json.data.token); }"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"{{customerUsername}}\",\n  \"password\": \"{{customerPassword}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "管理员登录 - 自动保存 adminToken",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('login success', function () { pm.response.to.have.status(200); });",
+                "const json = pm.response.json();",
+                "if (json.data && json.data.token) { pm.collectionVariables.set('adminToken', json.data.token); }"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"{{adminUsername}}\",\n  \"password\": \"{{adminPassword}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "获取当前客户",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{customerToken}}" }],
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+          }
+        },
+        {
+          "name": "修改当前客户资料",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"13900000002\",\n  \"address\": \"南京工程学院学生宿舍 2 栋 202\",\n  \"avatar\": \"\"\n}" },
+            "url": { "raw": "{{baseUrl}}/users/me", "host": ["{{baseUrl}}"], "path": ["users", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "分类接口",
+      "item": [
+        {
+          "name": "查询分类列表 - 自动保存第一个 categoryId",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "const json = pm.response.json();",
+                "if (json.data && json.data.length && json.data[0].id) { pm.collectionVariables.set('categoryId', String(json.data[0].id)); }"
+              ]
+            }
+          }],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] }
+          }
+        },
+        {
+          "name": "管理员新增分类 - 自动保存 categoryId",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "const json = pm.response.json();",
+                "if (json.data && json.data.id) { pm.collectionVariables.set('categoryId', String(json.data.id)); }"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"测试分类 {{$timestamp}}\",\n  \"sortOrder\": 99\n}" },
+            "url": { "raw": "{{baseUrl}}/admin/categories", "host": ["{{baseUrl}}"], "path": ["admin", "categories"] }
+          }
+        },
+        {
+          "name": "管理员修改分类",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"测试分类-已修改\",\n  \"sortOrder\": 100\n}" },
+            "url": { "raw": "{{baseUrl}}/admin/categories/{{categoryId}}", "host": ["{{baseUrl}}"], "path": ["admin", "categories", "{{categoryId}}"] }
+          }
+        },
+        {
+          "name": "管理员删除分类",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/categories/{{categoryId}}", "host": ["{{baseUrl}}"], "path": ["admin", "categories", "{{categoryId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "菜品接口",
+      "item": [
+        {
+          "name": "查询菜品列表 - 自动保存第一个 dishId",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "const json = pm.response.json();",
+                "const records = json.data && json.data.records;",
+                "if (records && records.length && records[0].id) { pm.collectionVariables.set('dishId', String(records[0].id)); }"
+              ]
+            }
+          }],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/dishes?keyword=鸡&categoryId=&status=1&sort=sales&page=1&pageSize=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["dishes"],
+              "query": [
+                { "key": "keyword", "value": "鸡" },
+                { "key": "categoryId", "value": "", "disabled": true },
+                { "key": "status", "value": "1" },
+                { "key": "sort", "value": "sales" },
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "查询菜品详情",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/dishes/{{dishId}}", "host": ["{{baseUrl}}"], "path": ["dishes", "{{dishId}}"] }
+          }
+        },
+        {
+          "name": "查询热销菜品",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/dishes/top?limit=5", "host": ["{{baseUrl}}"], "path": ["dishes", "top"], "query": [{ "key": "limit", "value": "5" }] }
+          }
+        },
+        {
+          "name": "查询今日推荐",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/dishes/recommend?limit=6", "host": ["{{baseUrl}}"], "path": ["dishes", "recommend"], "query": [{ "key": "limit", "value": "6" }] }
+          }
+        },
+        {
+          "name": "管理员新增菜品 - 自动保存 dishId",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "const json = pm.response.json();",
+                "if (json.data && json.data.id) { pm.collectionVariables.set('dishId', String(json.data.id)); }"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"categoryId\": {{categoryId}},\n  \"name\": \"Postman 测试菜品 {{$timestamp}}\",\n  \"price\": 12.50,\n  \"stock\": 50,\n  \"imageUrl\": \"{{imageUrl}}\",\n  \"description\": \"Postman 自动化测试创建的菜品\",\n  \"status\": 1\n}" },
+            "url": { "raw": "{{baseUrl}}/admin/dishes", "host": ["{{baseUrl}}"], "path": ["admin", "dishes"] }
+          }
+        },
+        {
+          "name": "管理员修改菜品",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"categoryId\": {{categoryId}},\n  \"name\": \"Postman 测试菜品-已修改\",\n  \"price\": 13.50,\n  \"stock\": 45,\n  \"imageUrl\": \"{{imageUrl}}\",\n  \"description\": \"修改后的菜品描述\",\n  \"status\": 1\n}" },
+            "url": { "raw": "{{baseUrl}}/admin/dishes/{{dishId}}", "host": ["{{baseUrl}}"], "path": ["admin", "dishes", "{{dishId}}"] }
+          }
+        },
+        {
+          "name": "管理员上架或下架菜品",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": 1\n}" },
+            "url": { "raw": "{{baseUrl}}/admin/dishes/{{dishId}}/status", "host": ["{{baseUrl}}"], "path": ["admin", "dishes", "{{dishId}}", "status"] }
+          }
+        },
+        {
+          "name": "管理员删除菜品",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/dishes/{{dishId}}", "host": ["{{baseUrl}}"], "path": ["admin", "dishes", "{{dishId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "购物车接口",
+      "item": [
+        {
+          "name": "查询购物车 - 自动保存第一个 cartItemId",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "const json = pm.response.json();",
+                "const items = json.data && json.data.items;",
+                "if (items && items.length && items[0].id) { pm.collectionVariables.set('cartItemId', String(items[0].id)); }"
+              ]
+            }
+          }],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{customerToken}}" }],
+            "url": { "raw": "{{baseUrl}}/cart", "host": ["{{baseUrl}}"], "path": ["cart"] }
+          }
+        },
+        {
+          "name": "添加购物车项",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"dishId\": {{dishId}},\n  \"quantity\": 2\n}" },
+            "url": { "raw": "{{baseUrl}}/cart/items", "host": ["{{baseUrl}}"], "path": ["cart", "items"] }
+          }
+        },
+        {
+          "name": "修改购物车数量",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"quantity\": 3\n}" },
+            "url": { "raw": "{{baseUrl}}/cart/items/{{cartItemId}}", "host": ["{{baseUrl}}"], "path": ["cart", "items", "{{cartItemId}}"] }
+          }
+        },
+        {
+          "name": "删除购物车项",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{customerToken}}" }],
+            "url": { "raw": "{{baseUrl}}/cart/items/{{cartItemId}}", "host": ["{{baseUrl}}"], "path": ["cart", "items", "{{cartItemId}}"] }
+          }
+        },
+        {
+          "name": "清空购物车",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{customerToken}}" }],
+            "url": { "raw": "{{baseUrl}}/cart", "host": ["{{baseUrl}}"], "path": ["cart"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "订单接口",
+      "item": [
+        {
+          "name": "提交订单 - 自动保存 orderId",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "const json = pm.response.json();",
+                "if (json.data && json.data.id) { pm.collectionVariables.set('orderId', String(json.data.id)); }"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"receiverName\": \"张三\",\n  \"receiverPhone\": \"13900000001\",\n  \"receiverAddress\": \"南京工程学院学生宿舍 1 栋 101\",\n  \"remark\": \"少辣，尽快送达\"\n}" },
+            "url": { "raw": "{{baseUrl}}/orders", "host": ["{{baseUrl}}"], "path": ["orders"] }
+          }
+        },
+        {
+          "name": "查询我的订单 - 自动保存第一个 orderId",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "const json = pm.response.json();",
+                "const records = json.data && json.data.records;",
+                "if (records && records.length && records[0].id) { pm.collectionVariables.set('orderId', String(records[0].id)); }"
+              ]
+            }
+          }],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{customerToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/orders/my?page=1&pageSize=10&status=",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "my"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "10" },
+                { "key": "status", "value": "", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "查询订单详情",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{customerToken}}" }],
+            "url": { "raw": "{{baseUrl}}/orders/{{orderId}}", "host": ["{{baseUrl}}"], "path": ["orders", "{{orderId}}"] }
+          }
+        },
+        {
+          "name": "取消订单",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"reason\": \"临时有事取消\"\n}" },
+            "url": { "raw": "{{baseUrl}}/orders/{{orderId}}/cancel", "host": ["{{baseUrl}}"], "path": ["orders", "{{orderId}}", "cancel"] }
+          }
+        },
+        {
+          "name": "管理员查询全部订单 - 自动保存第一个 orderId",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "const json = pm.response.json();",
+                "const records = json.data && json.data.records;",
+                "if (records && records.length && records[0].id) { pm.collectionVariables.set('orderId', String(records[0].id)); }"
+              ]
+            }
+          }],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/orders?keyword=&status=&startDate=&endDate=&page=1&pageSize=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "orders"],
+              "query": [
+                { "key": "keyword", "value": "", "disabled": true },
+                { "key": "status", "value": "", "disabled": true },
+                { "key": "startDate", "value": "", "disabled": true },
+                { "key": "endDate", "value": "", "disabled": true },
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "管理员查询订单详情",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/orders/{{orderId}}", "host": ["{{baseUrl}}"], "path": ["admin", "orders", "{{orderId}}"] }
+          }
+        },
+        {
+          "name": "管理员修改订单状态",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"ACCEPTED\"\n}" },
+            "url": { "raw": "{{baseUrl}}/admin/orders/{{orderId}}/status", "host": ["{{baseUrl}}"], "path": ["admin", "orders", "{{orderId}}", "status"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "数据看板接口",
+      "item": [
+        {
+          "name": "数据概览",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/statistics/overview", "host": ["{{baseUrl}}"], "path": ["admin", "statistics", "overview"] }
+          }
+        },
+        {
+          "name": "销售趋势",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/statistics/sales-trend?days=7", "host": ["{{baseUrl}}"], "path": ["admin", "statistics", "sales-trend"], "query": [{ "key": "days", "value": "7" }] }
+          }
+        },
+        {
+          "name": "热销菜品统计",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/statistics/top-dishes?limit=5", "host": ["{{baseUrl}}"], "path": ["admin", "statistics", "top-dishes"], "query": [{ "key": "limit", "value": "5" }] }
+          }
+        },
+        {
+          "name": "分类销售占比",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/statistics/category-sales", "host": ["{{baseUrl}}"], "path": ["admin", "statistics", "category-sales"] }
+          }
+        },
+        {
+          "name": "库存预警",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/statistics/stock-alert?threshold=10", "host": ["{{baseUrl}}"], "path": ["admin", "statistics", "stock-alert"], "query": [{ "key": "threshold", "value": "10" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "文件上传接口",
+      "item": [
+        {
+          "name": "上传菜品图片 - 手动选择 file",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "const json = pm.response.json();",
+                "if (json.data && json.data.url) { pm.collectionVariables.set('imageUrl', json.data.url); }"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": [] }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/upload/image", "host": ["{{baseUrl}}"], "path": ["upload", "image"] }
+          }
+        }
+      ]
+    }
+  ]
+}
